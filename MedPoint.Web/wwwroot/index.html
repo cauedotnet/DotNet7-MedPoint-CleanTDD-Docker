@@ -1,0 +1,408 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedPoint</title>
+    <!-- Bootstrap CSS CDN for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- React and ReactDOM JS CDN for React components -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- Babel JS CDN for JSX parsing -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="text/babel">
+
+        const AuthContext = React.createContext();
+
+        function AuthProvider({ children }) {
+            const [authData, setAuthData] = React.useState(null);
+
+            return (
+                <AuthContext.Provider value={{ authData, setAuthData }}>
+                    {children}
+                </AuthContext.Provider>
+            );
+        }
+
+       function NavBar({ setActiveComponent }) {
+            // Destructure both authData and setAuthData from AuthContext
+            const { authData, setAuthData } = React.useContext(AuthContext);
+
+            const handleLogout = () => {
+                setAuthData(null); // Clears the authentication context data
+                setActiveComponent("home"); // Optionally navigate the user back to the home component
+            };
+
+            return (
+                <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                    <a className="navbar-brand" href="#">MedPoint</a>
+                    <div className="collapse navbar-collapse">
+                        <ul className="navbar-nav mr-auto">
+                            <li className="nav-item active">
+                                <a className="nav-link" href="#" onClick={() => setActiveComponent("home")}>Home</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link" href="#" onClick={() => setActiveComponent("drugs")}>Drugs</a>
+                            </li>
+                            {authData ? (
+                                <li className="nav-item">
+                                    <a className="nav-link" href="#" onClick={handleLogout}>Logout</a>
+                                </li>
+                            ) : (
+                                <li className="nav-item">
+                                    <a className="nav-link" href="#" onClick={() => setActiveComponent("login")}>Login</a>
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+                </nav>
+            );
+        }
+
+
+
+        function Login({ setActiveComponent }) {
+            const [username, setUsername] = React.useState('');
+            const [password, setPassword] = React.useState('');
+            const { setAuthData } = React.useContext(AuthContext);
+
+            async function handleSubmit(event) {
+                event.preventDefault();
+                try {
+                    const response = await fetch('https://localhost:5001/api/user/authenticate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    if (!response.ok) {
+                        throw new Error('Authentication failed');
+                    }
+                    const data = await response.json();
+                    setAuthData(data); // Save the user and token in context
+                    setActiveComponent("home"); // Navigate back to home
+                } catch (error) {
+                    console.error("Login error:", error);
+                    // Handle login error (e.g., show an error message)
+                }
+            }
+
+            return (
+                <div className="container mt-5">
+                    <h2>Login</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Username</label>
+                            <input type="text" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                        </div>
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        </div>
+                        <button type="submit" className="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            );
+        }
+
+        function Drugs() {
+            const { authData } = React.useContext(AuthContext);
+            const [drugs, setDrugs] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [editingDrug, setEditingDrug] = React.useState(null);
+            const [form, setForm] = React.useState({
+                name: '',
+                chemicalName: '',
+                manufacturer: '',
+                description: '',
+                dosageAndAdministration: ''
+            });
+
+            React.useEffect(() => {
+                async function fetchDrugs() {
+                    setLoading(true);
+                    try {
+                        const response = await fetch(`https://localhost:5001/api/drug`);
+                        const data = await response.json();
+                        setDrugs(data);
+                    } catch (error) {
+                        console.error("Error fetching drugs:", error);
+                    } finally {
+                        setLoading(false);
+                    }
+                }
+
+                fetchDrugs();
+            }, []);
+
+            const handleFormChange = (e) => {
+                setForm({
+                    ...form,
+                    [e.target.name]: e.target.value
+                });
+            };
+
+            const resetForm = () => {
+                setForm({
+                    name: '',
+                    chemicalName: '',
+                    manufacturer: '',
+                    description: '',
+                    dosageAndAdministration: ''
+                });
+                setEditingDrug(null);
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (isEditing) {
+                    handleEditDrug(e); // Make sure to pass the event
+                } else {
+                    handleAddDrug(e); // Make sure to pass the event
+                }
+            };
+
+            const handleAddDrug = async () => {
+                event.preventDefault();
+
+                  try {
+                    const response = await fetch('https://localhost:5001/api/drug', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authData.token}`, // Assuming your authData contains the token
+                        },
+                        body: JSON.stringify(form),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to add drug');
+                    }
+
+                    const addedDrug = await response.json();
+                    setDrugs([...drugs, addedDrug]);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error adding drug:", error);
+                }
+            };
+
+            const startEditDrug = (drug) => {
+                setEditingDrug(drug);
+                setForm({ ...drug });
+            };
+
+            const handleEditDrug = async () => {
+                 event.preventDefault();
+
+                try {
+                    const response = await fetch(`https://localhost:5001/api/drug/${editingDrug.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authData.token}`,
+                        },
+                        body: JSON.stringify(form),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update drug');
+                    }
+
+                    // Update the drug in the local state
+                    setDrugs(drugs.map(drug => drug.id === editingDrug.id ? { ...drug, ...form } : drug));
+                    resetForm();
+                } catch (error) {
+                    console.error("Error updating drug:", error);
+                }
+
+            };
+
+            const handleDeleteDrug = async (drugId) => {
+                 event.preventDefault();
+
+                 try {
+                    const response = await fetch(`https://localhost:5001/api/drug/${drugId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authData.token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete drug');
+                    }
+
+                    // Remove the drug from local state
+                    setDrugs(drugs.filter(drug => drug.id !== drugId));
+                } catch (error) {
+                    console.error("Error deleting drug:", error);
+                }
+
+
+            };
+
+            const canEdit = authData && (authData.role === "Admin" || authData.role === "Contributor");
+            const isEditing = editingDrug !== null;
+
+            return (
+                <div className="container mt-5">
+                    <h2>Drugs</h2>
+                    <br/>
+                    {loading ? (
+                        <p>Loading drugs...</p>
+                    ) : (
+                        <div>
+                            {canEdit && (
+                                <form onSubmit={handleSubmit} className="row g-3">
+                                    <div className="col-md-6">
+                                        <input type="text" className="form-control" name="name" placeholder="Name" value={form.name} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <input type="text" className="form-control" name="chemicalName" placeholder="Chemical Name" value={form.chemicalName} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <input type="text" className="form-control" name="manufacturer" placeholder="Manufacturer" value={form.manufacturer} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <input type="text" className="form-control" name="description" placeholder="Description" value={form.description} onChange={handleFormChange} required />
+                                    </div>
+                                    <div className="col-12">
+                                        <textarea className="form-control" name="dosageAndAdministration" placeholder="Dosage & Administration" value={form.dosageAndAdministration} onChange={handleFormChange} required rows="3"></textarea>
+                                    </div>
+                                    <div className="col-12 d-flex justify-content-end">
+                                        <button type="submit" className="btn btn-success me-2">{isEditing ? "Save Changes" : "Add Drug"}</button>
+                                        {isEditing && <button type="button" onClick={resetForm} className="btn btn-secondary">Cancel</button>}
+                                    </div>
+                                </form>
+
+                            )}
+                            <br/>
+                            <div className="list-group">
+                                {drugs.map(drug => (
+                                    <div key={drug.id} className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p className="mb-1"><strong>{drug.name}</strong> ({drug.chemicalName}) - {drug.manufacturer}</p>
+                                        </div>
+                                        {canEdit && (
+                                            <div className="btn-group" role="group">
+                                                <button onClick={() => startEditDrug(drug)} className="btn btn-secondary btn-sm me-2">Edit</button>
+                                                <button onClick={() => handleDeleteDrug(drug.id)} className="btn btn-danger btn-sm">Delete</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+
+
+        function Home() {
+            const [searchTerm, setSearchTerm] = React.useState("");
+            const [searchResults, setSearchResults] = React.useState([]);
+            const [selectedDrug, setSelectedDrug] = React.useState(null);
+
+            async function fetchSearchResults(value) {
+                try {
+                    const response = await fetch(`https://localhost:5001/api/drug?searchTerm=${value}`);
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    setSearchResults(data);
+                } catch (error) {
+                    console.error("Fetching error:", error);
+                    setSearchResults([]);
+                }
+            }
+
+            function handleSearchChange(event) {
+                const value = event.target.value;
+                setSearchTerm(value);
+
+                if (value.trim().length > 2) {
+                    fetchSearchResults(value);
+                } else {
+                    setSearchResults([]);
+                }
+            }
+
+            function handleDrugClick(drug) {
+                setSelectedDrug(drug);
+                setSearchResults([]); // Hide the search results
+                setSearchTerm(''); // Optionally clear the search term
+            }
+
+            return (
+                <div className="container mt-5">
+                    <h1>Your digital prescribing assistant</h1>
+                    <p>Get prescribing information, forms, and tools to get patients on therapy for over 35,000 branded, generic, and OTC drugs.</p>
+                    <input type="search" className="form-control" placeholder="Search by drug" value={searchTerm} onChange={handleSearchChange} />
+                    {searchResults.length > 0 && (
+                        <div className="list-group">
+                            {searchResults.map(drug => (
+                                <a key={drug.id} href="#" className="list-group-item list-group-item-action" onClick={() => handleDrugClick(drug)}>
+                                    {drug.name}
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                    {selectedDrug && (
+                        <div className="drug-detail mt-3">
+                            <h2>{selectedDrug.name}</h2>
+                            <p><strong>Chemical Name:</strong> {selectedDrug.chemicalName}</p>
+                            <p><strong>Manufacturer:</strong> {selectedDrug.manufacturer}</p>
+                            <p><strong>Description:</strong> {selectedDrug.description}</p>
+                            <p><strong>Dosage and Administration:</strong> {selectedDrug.dosageAndAdministration}</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+
+
+        function App() {
+            const { authData } = React.useContext(AuthContext);
+            const [activeComponent, setActiveComponent] = React.useState("home");
+
+            const renderComponent = () => {
+                switch (activeComponent) {
+                    case "login":
+                        return <Login setActiveComponent={setActiveComponent} />;
+                    case "drugs":
+                        return <Drugs setActiveComponent={setActiveComponent} />;
+                    case "home":
+                    default:
+                        return <Home />;
+                }
+            };
+
+            return (
+                <div>
+                    <NavBar setActiveComponent={setActiveComponent} isAuthenticated={!!authData} />
+                    {renderComponent()}
+                </div>
+            );
+        }
+
+        ReactDOM.render(
+            <AuthProvider>
+                <App />
+            </AuthProvider>,
+            document.getElementById('app')
+        );
+
+    </script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34221.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MedPoint.Domain", "MedPoint.Domain\MedPoint.Domain.csproj", "{2DD6FECB-FCD2-4EE8-974E-B4BA9CE5226E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MedPoint.Application", "MedPoint.Application\MedPoint.Application.csproj", "{D961EAC2-BFEF-45CD-BA3D-6B26EBFDCEE0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MedPoint.Infrastructure", "MedPoint.Infrastructure\MedPoint.Infrastructure.csproj", "{FCA13862-87FC-4178-AF88-8EBA28B99581}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MedPoint.Tests", "MedPoint.Tests\MedPoint.Tests.csproj", "{80A2E4A5-A677-4BF5-A4CB-EFAA94B75128}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{57A2D915-4756-4537-AA65-258A40D63FB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedPoint.Web", "MedPoint.Web\MedPoint.Web.csproj", "{44057F4D-1B33-447B-9F08-C7021146EC7A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2DD6FECB-FCD2-4EE8-974E-B4BA9CE5226E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DD6FECB-FCD2-4EE8-974E-B4BA9CE5226E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DD6FECB-FCD2-4EE8-974E-B4BA9CE5226E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DD6FECB-FCD2-4EE8-974E-B4BA9CE5226E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D961EAC2-BFEF-45CD-BA3D-6B26EBFDCEE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D961EAC2-BFEF-45CD-BA3D-6B26EBFDCEE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D961EAC2-BFEF-45CD-BA3D-6B26EBFDCEE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D961EAC2-BFEF-45CD-BA3D-6B26EBFDCEE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA13862-87FC-4178-AF88-8EBA28B99581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA13862-87FC-4178-AF88-8EBA28B99581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA13862-87FC-4178-AF88-8EBA28B99581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA13862-87FC-4178-AF88-8EBA28B99581}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EC6B6C5-E1B0-47B9-8026-B7C6D2D4CCEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EC6B6C5-E1B0-47B9-8026-B7C6D2D4CCEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EC6B6C5-E1B0-47B9-8026-B7C6D2D4CCEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EC6B6C5-E1B0-47B9-8026-B7C6D2D4CCEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80A2E4A5-A677-4BF5-A4CB-EFAA94B75128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80A2E4A5-A677-4BF5-A4CB-EFAA94B75128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80A2E4A5-A677-4BF5-A4CB-EFAA94B75128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80A2E4A5-A677-4BF5-A4CB-EFAA94B75128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57A2D915-4756-4537-AA65-258A40D63FB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57A2D915-4756-4537-AA65-258A40D63FB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57A2D915-4756-4537-AA65-258A40D63FB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57A2D915-4756-4537-AA65-258A40D63FB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44057F4D-1B33-447B-9F08-C7021146EC7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44057F4D-1B33-447B-9F08-C7021146EC7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44057F4D-1B33-447B-9F08-C7021146EC7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44057F4D-1B33-447B-9F08-C7021146EC7A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1ED939C5-9A79-4588-AFB5-BF727389C63F}
+	EndGlobalSection
+EndGlobal
